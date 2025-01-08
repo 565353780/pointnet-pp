@@ -18,28 +18,22 @@ class Detector(object):
             self.loadModel(model_file_path)
         return
 
-    def loadModel(self, model_file_path, resume_model_only=True):
+    def loadModel(self, model_file_path):
         if not os.path.exists(model_file_path):
             print("[ERROR][Detector::loadModel]")
             print("\t model file not exist!")
             print("\t model_file_path:", model_file_path)
             return False
 
-        model_dict = torch.load(
-            model_file_path, map_location=torch.device(self.device))
+        state_dict = torch.load(
+            model_file_path, map_location='cpu')
 
-        self.model.load_state_dict(model_dict["model_state_dict"])
+        model_state_dict = state_dict['model_state_dict']
 
-        if not resume_model_only:
-            # self.optimizer.load_state_dict(model_dict["optimizer"])
-            self.step = model_dict["step"]
-            self.eval_step = model_dict["eval_step"]
-            self.loss_min = model_dict["loss_min"]
-            self.eval_loss_min = model_dict["eval_loss_min"]
-            self.log_folder_name = model_dict["log_folder_name"]
+        self.model.load_state_dict(model_state_dict)
 
         print("[INFO][Detector::loadModel]")
-        print("\t load model success!")
+        print("\t model loaded from:", model_file_path)
         return True
 
     @torch.no_grad()
