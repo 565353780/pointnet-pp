@@ -11,7 +11,8 @@ class Detector(object):
     ) -> None:
         self.device = device
 
-        self.model = get_model(40, False)
+        self.model = get_model(40, False).to(device)
+        self.model.eval()
 
         if model_file_path is not None:
             self.loadModel(model_file_path)
@@ -41,6 +42,7 @@ class Detector(object):
         print("\t load model success!")
         return True
 
+    @torch.no_grad()
     def detect(self, points: torch.Tensor) -> torch.Tensor:
         x, l3_points = self.model(points)
         return x, l3_points
